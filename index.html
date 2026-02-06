@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Tasbih</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           CSS RESET & BASE
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        /* ============================================
+           COLOR TOKENS
+           ============================================ */
+        :root {
+            --bg: #0E1F1A;
+            --surface: #132B24;
+            --primary: #3FBF8E;
+            --accent: #8FF0C8;
+            --text-main: #EAF6F1;
+            --text-muted: #9FBDB2;
+            --ring-base: #1F3D34;
+        }
+
+        /* ============================================
+           LAYOUT
+           ============================================ */
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            touch-action: pan-y;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 60px 24px 80px;
+            position: relative;
+        }
+
+        /* ============================================
+           LANGUAGE TOGGLE
+           ============================================ */
+        .lang-toggle {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: var(--surface);
+            border: 1px solid var(--ring-base);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+
+        .lang-toggle:active {
+            transform: scale(0.95);
+            background: var(--ring-base);
+        }
+
+        /* ============================================
+           DHIKR NAME (TOP)
+           ============================================ */
+        .dhikr-name {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text-main);
+            transition: opacity 0.15s ease;
+            text-align: center;
+            min-height: 40px;
+        }
+
+        /* ============================================
+           DIAL (CENTER)
+           ============================================ */
+        .dial-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Outer glow ring */
+        .dial-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle at center,
+                transparent 60%,
+                var(--surface) 60%,
+                var(--surface) 100%
+            );
+            box-shadow: 
+                0 0 40px rgba(143, 240, 200, 0.1),
+                inset 0 0 60px rgba(19, 43, 36, 0.8);
+        }
+
+        /* SVG progress ring */
+        .progress-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-bg {
+            fill: none;
+            stroke: var(--ring-base);
+            stroke-width: 3;
+        }
+
+        .progress-ring-fill {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 3;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.2s ease;
+            filter: drop-shadow(0 0 8px var(--accent));
+        }
+
+        /* Center circle (tap area) */
+        .dial-center {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle at 40% 40%,
+                rgba(63, 191, 142, 0.08),
+                var(--surface) 60%
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 2px 8px rgba(143, 240, 200, 0.05);
+        }
+
+        .dial-center:active {
+            transform: scale(0.98);
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.5),
+                inset 0 2px 12px rgba(143, 240, 200, 0.1);
+        }
+
+        /* Counter number */
+        .counter {
+            font-size: 96px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -2px;
+            transition: all 0.15s ease;
+        }
+
+        .counter.pulse {
+            animation: countPulse 0.2s ease;
+        }
+
+        @keyframes countPulse {
+            50% { transform: scale(1.05); }
+        }
+
+        /* Goal completion glow */
+        .dial-container.goal-complete .dial-ring {
+            animation: goalGlow 1.5s ease-out;
+        }
+
+        @keyframes goalGlow {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 40px rgba(143, 240, 200, 0.1),
+                    inset 0 0 60px rgba(19, 43, 36, 0.8);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 80px rgba(143, 240, 200, 0.4),
+                    inset 0 0 80px rgba(63, 191, 142, 0.2);
+            }
+        }
+
+        /* ============================================
+           PROGRESS TEXT (BOTTOM)
+           ============================================ */
+        .progress-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        /* ============================================
+           RESET BUTTON (BOTTOM)
+           ============================================ */
+        .reset-btn {
+            position: absolute;
+            bottom: 32px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 1px solid var(--ring-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .reset-btn:active {
+            transform: scale(0.9);
+            background: var(--ring-base);
+        }
+
+        .reset-icon {
+            width: 24px;
+            height: 24px;
+            stroke: var(--text-muted);
+            stroke-width: 2;
+            stroke-linecap: round;
+            fill: none;
+        }
+
+        /* ============================================
+           SETTINGS MENU (SLIDE UP)
+           ============================================ */
+        .settings-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(14, 31, 26, 0.8);
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 200;
+        }
+
+        .settings-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .settings-menu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--surface);
+            border-radius: 24px 24px 0 0;
+            padding: 32px 24px;
+            transform: translateY(100%);
+            transition: transform 0.2s ease;
+            z-index: 201;
+            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .settings-menu.visible {
+            transform: translateY(0);
+        }
+
+        .settings-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .settings-section {
+            margin-bottom: 24px;
+        }
+
+        .settings-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .goal-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .goal-btn {
+            flex: 1;
+            padding: 14px;
+            background: var(--bg);
+            border: 1px solid var(--ring-base);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .goal-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--bg);
+        }
+
+        .goal-btn:active {
+            transform: scale(0.95);
+        }
+
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        .toggle-label {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 28px;
+            background: var(--ring-base);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .toggle-switch.active {
+            background: var(--primary);
+        }
+
+        .toggle-knob {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: var(--text-main);
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+
+        .toggle-switch.active .toggle-knob {
+            transform: translateX(20px);
+        }
+
+        .reset-confirm-btn {
+            width: 100%;
+            padding: 16px;
+            background: #BF3F3F;
+            border: none;
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: all 0.15s ease;
+        }
+
+        .reset-confirm-btn:active {
+            transform: scale(0.98);
+            background: #A03030;
+        }
+
+        /* ============================================
+           CREDIT FOOTER
+           ============================================ */
+        .credit {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+
+        .credit a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-height: 700px) {
+            .dial-container {
+                width: 280px;
+                height: 280px;
+            }
+            .dial-center {
+                width: 230px;
+                height: 230px;
+            }
+            .counter {
+                font-size: 80px;
+            }
+            body {
+                padding: 40px 24px 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Toggle -->
+    <button class="lang-toggle" id="langToggle">العربية</button>
+
+    <!-- Dhikr Name -->
+    <div class="dhikr-name" id="dhikrName">SubhanAllah</div>
+
+    <!-- Dial -->
+    <div class="dial-container" id="dialContainer">
+        <div class="dial-ring"></div>
+        
+        <!-- SVG Progress Ring -->
+        <svg class="progress-ring" width="320" height="320">
+            <circle class="progress-ring-bg" cx="160" cy="160" r="155" />
+            <circle class="progress-ring-fill" id="progressCircle" cx="160" cy="160" r="155" />
+        </svg>
+
+        <!-- Center -->
+        <div class="dial-center" id="dialCenter">
+            <div class="counter" id="counter">0</div>
+        </div>
+    </div>
+
+    <!-- Progress Text -->
+    <div class="progress-text" id="progressText">0 / 100</div>
+
+    <!-- Reset Button -->
+    <button class="reset-btn" id="resetBtn">
+        <svg class="reset-icon" viewBox="0 0 24 24">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+            <path d="M21 3v5h-5"/>
+        </svg>
+    </button>
+
+    <!-- Settings Overlay -->
+    <div class="settings-overlay" id="settingsOverlay"></div>
+    
+    <!-- Settings Menu -->
+    <div class="settings-menu" id="settingsMenu">
+        <div class="settings-header">Settings</div>
+
+        <!-- Goal Selection -->
+        <div class="settings-section">
+            <div class="settings-label">Goal</div>
+            <div class="goal-options">
+                <button class="goal-btn" data-goal="33">33</button>
+                <button class="goal-btn active" data-goal="100">100</button>
+                <button class="goal-btn" data-goal="1000">1000</button>
+            </div>
+        </div>
+
+        <!-- Toggles -->
+        <div class="settings-section">
+            <div class="toggle-row">
+                <div class="toggle-label">Sound</div>
+                <div class="toggle-switch" id="soundToggle">
+                    <div class="toggle-knob"></div>
+                </div>
+            </div>
+            <div class="toggle-row">
+                <div class="toggle-label">Haptics</div>
+                <div class="toggle-switch active" id="hapticsToggle">
+                    <div class="toggle-knob"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reset Counter -->
+        <button class="reset-confirm-btn" id="resetConfirm">Reset Counter</button>
+    </div>
+
+    <!-- Credit -->
+    <div class="credit">
+        Created by <a href="https://www.instagram.com/zulceo" target="_blank">Zul</a>
+    </div>
+
+    <script>
+        // ============================================
+        // STATE
+        // ============================================
+        const dhikrList = [
+            { en: 'SubhanAllah', ar: 'سبحان الله' },
+            { en: 'Alhamdulillah', ar: 'الحمد لله' },
+            { en: 'Allahu Akbar', ar: 'الله أكبر' },
+            { en: 'La ilaha illallah', ar: 'لا إله إلا الله' }
+        ];
+
+        let currentDhikrIndex = 0;
+        let count = 0;
+        let goal = 100;
+        let soundEnabled = false;
+        let hapticsEnabled = true;
+        let isArabic = false;
+
+        // ============================================
+        // ELEMENTS
+        // ============================================
+        const dialContainer = document.getElementById('dialContainer');
+        const dialCenter = document.getElementById('dialCenter');
+        const counter = document.getElementById('counter');
+        const dhikrName = document.getElementById('dhikrName');
+        const progressText = document.getElementById('progressText');
+        const progressCircle = document.getElementById('progressCircle');
+        const settingsOverlay = document.getElementById('settingsOverlay');
+        const settingsMenu = document.getElementById('settingsMenu');
+        const resetBtn = document.getElementById('resetBtn');
+        const resetConfirm = document.getElementById('resetConfirm');
+        const langToggle = document.getElementById('langToggle');
+        const soundToggle = document.getElementById('soundToggle');
+        const hapticsToggle = document.getElementById('hapticsToggle');
+        const goalBtns = document.querySelectorAll('.goal-btn');
+
+        // ============================================
+        // AUDIO SETUP
+        // ============================================
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound() {
+            if (!soundEnabled) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+
+        function playGoalSound() {
+            if (!soundEnabled) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 1000;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+
+        // ============================================
+        // HAPTICS
+        // ============================================
+        function vibrate(pattern) {
+            if (!hapticsEnabled) return;
+            if (navigator.vibrate) {
+                navigator.vibrate(pattern);
+            }
+        }
+
+        // ============================================
+        // PROGRESS RING
+        // ============================================
+        const radius = 155;
+        const circumference = 2 * Math.PI * radius;
+        progressCircle.style.strokeDasharray = circumference;
+        progressCircle.style.strokeDashoffset = circumference;
+
+        function updateProgress() {
+            const percentage = Math.min(count / goal, 1);
+            const offset = circumference - (percentage * circumference);
+            progressCircle.style.strokeDashoffset = offset;
+        }
+
+        // ============================================
+        // UPDATE DISPLAY
+        // ============================================
+        function updateDisplay() {
+            counter.textContent = count;
+            progressText.textContent = `${count} / ${goal}`;
+            updateProgress();
+            
+            const currentDhikr = dhikrList[currentDhikrIndex];
+            dhikrName.textContent = isArabic ? currentDhikr.ar : currentDhikr.en;
+        }
+
+        // ============================================
+        // TAP TO INCREMENT
+        // ============================================
+        dialCenter.addEventListener('click', () => {
+            count++;
+            counter.classList.add('pulse');
+            setTimeout(() => counter.classList.remove('pulse'), 200);
+            
+            vibrate(10);
+            playSound();
+            updateDisplay();
+            
+            // Goal reached
+            if (count === goal) {
+                dialContainer.classList.add('goal-complete');
+                vibrate([50, 30, 50, 30, 100]);
+                playGoalSound();
+                setTimeout(() => {
+                    dialContainer.classList.remove('goal-complete');
+                }, 1500);
+            }
+        });
+
+        // ============================================
+        // SWIPE NAVIGATION
+        // ============================================
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        dialContainer.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        dialContainer.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const diff = touchStartX - touchEndX;
+            const threshold = 50;
+            
+            if (Math.abs(diff) > threshold) {
+                dhikrName.style.opacity = '0';
+                
+                setTimeout(() => {
+                    if (diff > 0) {
+                        // Swipe left - next dhikr
+                        currentDhikrIndex = (currentDhikrIndex + 1) % dhikrList.length;
+                    } else {
+                        // Swipe right - previous dhikr
+                        currentDhikrIndex = (currentDhikrIndex - 1 + dhikrList.length) % dhikrList.length;
+                    }
+                    updateDisplay();
+                    dhikrName.style.opacity = '1';
+                }, 150);
+                
+                vibrate(5);
+            }
+        }
+
+        // ============================================
+        // LONG PRESS FOR SETTINGS
+        // ============================================
+        let longPressTimer;
+        
+        dialCenter.addEventListener('touchstart', (e) => {
+            longPressTimer = setTimeout(() => {
+                vibrate(20);
+                showSettings();
+            }, 600);
+        });
+
+        dialCenter.addEventListener('touchend', () => {
+            clearTimeout(longPressTimer);
+        });
+
+        dialCenter.addEventListener('touchmove', () => {
+            clearTimeout(longPressTimer);
+        });
+
+        function showSettings() {
+            settingsOverlay.classList.add('visible');
+            settingsMenu.classList.add('visible');
+        }
+
+        function hideSettings() {
+            settingsOverlay.classList.remove('visible');
+            settingsMenu.classList.remove('visible');
+        }
+
+        settingsOverlay.addEventListener('click', hideSettings);
+
+        // ============================================
+        // SETTINGS - GOAL
+        // ============================================
+        goalBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                goalBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                goal = parseInt(btn.dataset.goal);
+                updateDisplay();
+                vibrate(5);
+            });
+        });
+
+        // ============================================
+        // SETTINGS - TOGGLES
+        // ============================================
+        soundToggle.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            soundToggle.classList.toggle('active');
+            vibrate(5);
+        });
+
+        hapticsToggle.addEventListener('click', () => {
+            hapticsEnabled = !hapticsEnabled;
+            hapticsToggle.classList.toggle('active');
+            if (hapticsEnabled) vibrate(5);
+        });
+
+        // ============================================
+        // RESET
+        // ============================================
+        resetBtn.addEventListener('click', () => {
+            showSettings();
+        });
+
+        resetConfirm.addEventListener('click', () => {
+            count = 0;
+            updateDisplay();
+            hideSettings();
+            vibrate(20);
+        });
+
+        // ============================================
+        // LANGUAGE TOGGLE
+        // ============================================
+        langToggle.addEventListener('click', () => {
+            isArabic = !isArabic;
+            langToggle.textContent = isArabic ? 'English' : 'العربية';
+            updateDisplay();
+            vibrate(5);
+        });
+
+        // ============================================
+        // INITIALIZE
+        // ============================================
+        updateDisplay();
+    </script>
+</body>
+</html>
