@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- FIX #1: Prevent zoom on tap - added user-scalable=no and proper viewport settings -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -11,25 +10,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* ============================================
-           RESET & BASE
-           ============================================ */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
-            /* FIX #1: Prevent text selection and zoom */
             -webkit-user-select: none;
             -webkit-touch-callout: none;
         }
 
-        /* ============================================
-           THEME VARIABLES
-           ============================================ */
         :root {
-            /* Classic Green - Default */
             --bg: #0E1F1A;
             --surface: #132B24;
             --primary: #3FBF8E;
@@ -87,22 +78,18 @@
             background: var(--bg);
             color: var(--text-main);
             transition: background 0.3s ease, color 0.3s ease;
-            /* FIX #1: Prevent zoom on double tap */
             touch-action: pan-y;
         }
 
         body {
             padding: 20px;
-            padding-bottom: 120px; /* Increased for email display */
+            padding-bottom: 120px;
         }
 
         body.rtl {
             direction: rtl;
         }
 
-        /* ============================================
-           HEADER
-           ============================================ */
         .header {
             display: flex;
             justify-content: space-between;
@@ -113,7 +100,6 @@
         .user-greeting {
             font-size: 18px;
             font-weight: 600;
-            color: var(--text-main);
         }
 
         .header-controls {
@@ -136,12 +122,8 @@
 
         .lang-toggle:active, .theme-toggle:active {
             transform: scale(0.95);
-            background: var(--ring-base);
         }
 
-        /* ============================================
-           MODE SELECTOR
-           ============================================ */
         .mode-selector {
             display: flex;
             gap: 8px;
@@ -170,13 +152,6 @@
             color: var(--bg);
         }
 
-        .mode-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* ============================================
-           LIMIT SELECTOR (Free Mode)
-           ============================================ */
         .limit-selector {
             display: flex;
             gap: 8px;
@@ -207,20 +182,12 @@
             color: var(--bg);
         }
 
-        .limit-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* ============================================
-           DHIKR SELECTOR (Free Mode)
-           ============================================ */
         .dhikr-selector {
             display: flex;
             gap: 8px;
             margin-bottom: 32px;
             overflow-x: auto;
             padding: 4px;
-            -webkit-overflow-scrolling: touch;
         }
 
         .dhikr-selector.hidden {
@@ -248,13 +215,6 @@
             color: var(--bg);
         }
 
-        .dhikr-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* ============================================
-           COUNTER CIRCLE
-           ============================================ */
         .counter-container {
             display: flex;
             flex-direction: column;
@@ -267,7 +227,6 @@
             font-weight: 600;
             margin-bottom: 8px;
             text-align: center;
-            color: var(--text-main);
         }
 
         .progress-label {
@@ -286,9 +245,7 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 24px;
-            /* FIX #1: Critical - prevent any zoom behavior */
             touch-action: manipulation;
-            cursor: pointer;
         }
 
         .dial-ring {
@@ -296,15 +253,8 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: radial-gradient(
-                circle at center,
-                transparent 60%,
-                var(--surface) 60%,
-                var(--surface) 100%
-            );
-            box-shadow: 
-                0 0 40px rgba(143, 240, 200, 0.1),
-                inset 0 0 60px rgba(19, 43, 36, 0.8);
+            background: radial-gradient(circle at center, transparent 60%, var(--surface) 60%, var(--surface) 100%);
+            box-shadow: 0 0 40px rgba(143, 240, 200, 0.1), inset 0 0 60px rgba(19, 43, 36, 0.8);
             transition: box-shadow 0.3s ease;
         }
 
@@ -336,28 +286,18 @@
             width: 250px;
             height: 250px;
             border-radius: 50%;
-            background: radial-gradient(
-                circle at 40% 40%,
-                rgba(63, 191, 142, 0.08),
-                var(--surface) 60%
-            );
+            background: radial-gradient(circle at 40% 40%, rgba(63, 191, 142, 0.08), var(--surface) 60%);
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.15s ease;
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.4),
-                inset 0 2px 8px rgba(143, 240, 200, 0.05);
-            /* FIX #1: Critical - prevent zoom on this tap target */
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 2px 8px rgba(143, 240, 200, 0.05);
             touch-action: manipulation;
             cursor: pointer;
         }
 
         .dial-center:active {
             transform: scale(0.98);
-            box-shadow: 
-                0 4px 16px rgba(0, 0, 0, 0.5),
-                inset 0 2px 12px rgba(143, 240, 200, 0.1);
         }
 
         .counter {
@@ -365,33 +305,24 @@
             font-weight: 700;
             color: var(--text-main);
             letter-spacing: -2px;
-            transition: all 0.15s ease;
             pointer-events: none;
         }
 
         .counter.pulse {
-            animation: countPulse 0.2s ease;
+            animation: pulse 0.2s ease;
         }
 
-        @keyframes countPulse {
+        @keyframes pulse {
             50% { transform: scale(1.08); }
         }
 
-        .goal-complete-glow {
-            animation: goalGlow 1s ease-out;
+        .goal-glow {
+            animation: glow 1s ease-out;
         }
 
-        @keyframes goalGlow {
-            0%, 100% { 
-                box-shadow: 
-                    0 0 40px rgba(143, 240, 200, 0.1),
-                    inset 0 0 60px rgba(19, 43, 36, 0.8);
-            }
-            50% { 
-                box-shadow: 
-                    0 0 80px rgba(143, 240, 200, 0.4),
-                    inset 0 0 80px rgba(63, 191, 142, 0.2);
-            }
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 40px rgba(143, 240, 200, 0.1), inset 0 0 60px rgba(19, 43, 36, 0.8); }
+            50% { box-shadow: 0 0 80px rgba(143, 240, 200, 0.4), inset 0 0 80px rgba(63, 191, 142, 0.2); }
         }
 
         .progress-text {
@@ -401,9 +332,6 @@
             text-align: center;
         }
 
-        /* ============================================
-           CONTROLS
-           ============================================ */
         .controls {
             display: flex;
             gap: 12px;
@@ -426,13 +354,9 @@
 
         .control-btn:active {
             transform: scale(0.95);
-            background: var(--ring-base);
         }
 
-        /* ============================================
-           SALAH TRACKER
-           ============================================ */
-        .salah-section {
+        .salah-section, .leaderboard-section {
             background: var(--surface);
             border-radius: 16px;
             padding: 20px;
@@ -443,24 +367,25 @@
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 16px;
-            color: var(--text-main);
         }
 
-        .salah-list {
+        .salah-list, .leaderboard-list {
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
 
-        .salah-item {
+        .salah-item, .leaderboard-item {
             display: flex;
             align-items: center;
             gap: 12px;
             padding: 12px;
             background: var(--bg);
             border-radius: 12px;
+        }
+
+        .salah-item {
             cursor: pointer;
-            transition: all 0.15s ease;
             touch-action: manipulation;
         }
 
@@ -476,7 +401,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
         }
 
         .salah-item.checked .checkbox {
@@ -501,16 +425,6 @@
             font-weight: 500;
         }
 
-        /* ============================================
-           LEADERBOARD
-           ============================================ */
-        .leaderboard-section {
-            background: var(--surface);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 24px;
-        }
-
         .leaderboard-header {
             display: flex;
             justify-content: space-between;
@@ -523,19 +437,8 @@
             color: var(--text-muted);
         }
 
-        .leaderboard-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
         .leaderboard-item {
-            display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            background: var(--bg);
-            border-radius: 12px;
         }
 
         .dhikr-label {
@@ -550,9 +453,6 @@
             color: var(--primary);
         }
 
-        /* ============================================
-           THEME MODAL
-           ============================================ */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -561,18 +461,14 @@
             height: 100%;
             background: rgba(14, 31, 26, 0.9);
             backdrop-filter: blur(8px);
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s ease;
         }
 
         .modal-overlay.visible {
-            opacity: 1;
-            pointer-events: all;
+            display: flex;
         }
 
         .modal {
@@ -602,10 +498,6 @@
             outline: none;
         }
 
-        .modal-input:focus {
-            border-color: var(--primary);
-        }
-
         .theme-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -618,7 +510,6 @@
             border-radius: 12px;
             border: 2px solid var(--ring-base);
             cursor: pointer;
-            transition: all 0.2s ease;
             text-align: center;
             touch-action: manipulation;
         }
@@ -627,10 +518,6 @@
             border-color: var(--primary);
             background: var(--primary);
             color: var(--bg);
-        }
-
-        .theme-option:active {
-            transform: scale(0.95);
         }
 
         .theme-color {
@@ -655,7 +542,6 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.15s ease;
             touch-action: manipulation;
         }
 
@@ -663,9 +549,6 @@
             transform: scale(0.98);
         }
 
-        /* ============================================
-           FOOTER - FIX #3: Added email display
-           ============================================ */
         .footer {
             position: fixed;
             bottom: 0;
@@ -688,37 +571,18 @@
             color: var(--primary);
             text-decoration: none;
             font-size: 12px;
-            opacity: 0.9;
-            transition: opacity 0.2s ease;
+            display: block;
         }
 
-        .footer-email:hover {
-            opacity: 1;
-        }
-
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
         @media (max-width: 380px) {
-            .dial-container {
-                width: 260px;
-                height: 260px;
-            }
-            .dial-center {
-                width: 220px;
-                height: 220px;
-            }
-            .counter {
-                font-size: 64px;
-            }
-            .dhikr-name {
-                font-size: 26px;
-            }
+            .dial-container { width: 260px; height: 260px; }
+            .dial-center { width: 220px; height: 220px; }
+            .counter { font-size: 64px; }
+            .dhikr-name { font-size: 26px; }
         }
     </style>
 </head>
 <body>
-    <!-- Name Input Modal -->
     <div class="modal-overlay" id="nameModal">
         <div class="modal">
             <div class="modal-title" id="modalTitle">Enter Your Name (Optional)</div>
@@ -727,7 +591,6 @@
         </div>
     </div>
 
-    <!-- Theme Selector Modal -->
     <div class="modal-overlay" id="themeModal">
         <div class="modal">
             <div class="modal-title" id="themeModalTitle">Choose Theme</div>
@@ -736,7 +599,6 @@
         </div>
     </div>
 
-    <!-- Header -->
     <div class="header">
         <div class="user-greeting" id="userGreeting">Assalamu Alaikum</div>
         <div class="header-controls">
@@ -745,35 +607,29 @@
         </div>
     </div>
 
-    <!-- Mode Selector -->
     <div class="mode-selector">
         <button class="mode-btn active" id="sunnahModeBtn">After Salah</button>
         <button class="mode-btn" id="freeModeBtn">Free Count</button>
     </div>
 
-    <!-- Limit Selector (Free Mode Only) -->
     <div class="limit-selector hidden" id="limitSelector">
         <button class="limit-btn" data-limit="unlimited">∞</button>
         <button class="limit-btn" data-limit="99">99</button>
         <button class="limit-btn active" data-limit="100">100</button>
     </div>
 
-    <!-- Dhikr Selector (Free Mode Only) -->
     <div class="dhikr-selector hidden" id="dhikrSelector"></div>
 
-    <!-- Counter -->
     <div class="counter-container">
         <div class="dhikr-name" id="dhikrName">SubhanAllah</div>
         <div class="progress-label" id="progressLabel">1 / 3</div>
         
-        <div class="dial-container" id="dialContainer">
+        <div class="dial-container">
             <div class="dial-ring" id="dialRing"></div>
-            
             <svg class="progress-ring" width="300" height="300">
                 <circle class="progress-ring-bg" cx="150" cy="150" r="145" />
                 <circle class="progress-ring-fill" id="progressCircle" cx="150" cy="150" r="145" />
             </svg>
-
             <div class="dial-center" id="dialCenter">
                 <div class="counter" id="counter">0</div>
             </div>
@@ -782,19 +638,16 @@
         <div class="progress-text" id="progressText">Tap to begin</div>
     </div>
 
-    <!-- Controls -->
     <div class="controls">
         <button class="control-btn" id="resetBtn">Reset</button>
         <button class="control-btn" id="changeNameBtn">Name</button>
     </div>
 
-    <!-- Salah Tracker -->
     <div class="salah-section">
         <div class="section-title" id="salahTitle">Today's Salah</div>
         <div class="salah-list" id="salahList"></div>
     </div>
 
-    <!-- Leaderboard -->
     <div class="leaderboard-section">
         <div class="leaderboard-header">
             <div class="section-title" id="leaderboardTitle">Today's Progress</div>
@@ -803,14 +656,13 @@
         <div class="leaderboard-list" id="leaderboardList"></div>
     </div>
 
-    <!-- FIX #3: Footer with visible email -->
     <div class="footer">
         <div class="footer-credit">Made by Zul</div>
-        <a href="/cdn-cgi/l/email-protection#691d081a0b0001041c1a050004081919290e04080005470a0604" class="footer-email"><span class="__cf_email__" data-cfemail="6b1f0a18090203061e180702060a1b1b2b0c060a020745080406">[email&#160;protected]</span></a>
+        <a href="mailto:tasbihmuslimapp@gmail.com" class="footer-email">tasbihmuslimapp@gmail.com</a>
     </div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-        // FIX #1: Prevent double-tap zoom globally
+    <script>
+        // Prevent double-tap zoom
         let lastTouchEnd = 0;
         document.addEventListener('touchend', (e) => {
             const now = Date.now();
@@ -820,9 +672,6 @@
             lastTouchEnd = now;
         }, { passive: false });
 
-        // ============================================
-        // TRANSLATIONS
-        // ============================================
         const translations = {
             en: {
                 greeting: 'Assalamu Alaikum',
@@ -900,9 +749,6 @@
             }
         };
 
-        // ============================================
-        // STATE
-        // ============================================
         const dhikrKeys = ['subhanallah', 'alhamdulillah', 'allahuakbar', 'astaghfirullah'];
         const sunnahSequence = [
             { dhikr: 'subhanallah', goal: 33 },
@@ -921,85 +767,65 @@
         let limit = 100;
         let sunnahStep = 0;
 
-        // ============================================
-        // ELEMENTS
-        // ============================================
-        const nameModal = document.getElementById('nameModal');
-        const themeModal = document.getElementById('themeModal');
-        const nameInput = document.getElementById('nameInput');
-        const saveNameBtn = document.getElementById('saveNameBtn');
-        const userGreeting = document.getElementById('userGreeting');
-        const langToggle = document.getElementById('langToggle');
-        const themeToggle = document.getElementById('themeToggle');
-        const sunnahModeBtn = document.getElementById('sunnahModeBtn');
-        const freeModeBtn = document.getElementById('freeModeBtn');
-        const limitSelector = document.getElementById('limitSelector');
-        const dhikrSelector = document.getElementById('dhikrSelector');
-        const dhikrName = document.getElementById('dhikrName');
-        const progressLabel = document.getElementById('progressLabel');
-        const dialContainer = document.getElementById('dialContainer');
-        const dialCenter = document.getElementById('dialCenter');
-        const dialRing = document.getElementById('dialRing');
-        const counter = document.getElementById('counter');
-        const progressText = document.getElementById('progressText');
-        const progressCircle = document.getElementById('progressCircle');
-        const resetBtn = document.getElementById('resetBtn');
-        const changeNameBtn = document.getElementById('changeNameBtn');
-        const themeGrid = document.getElementById('themeGrid');
-        const closeThemeBtn = document.getElementById('closeThemeBtn');
-        const salahList = document.getElementById('salahList');
-        const leaderboardList = document.getElementById('leaderboardList');
+        const elements = {
+            nameModal: document.getElementById('nameModal'),
+            themeModal: document.getElementById('themeModal'),
+            nameInput: document.getElementById('nameInput'),
+            saveNameBtn: document.getElementById('saveNameBtn'),
+            userGreeting: document.getElementById('userGreeting'),
+            langToggle: document.getElementById('langToggle'),
+            themeToggle: document.getElementById('themeToggle'),
+            sunnahModeBtn: document.getElementById('sunnahModeBtn'),
+            freeModeBtn: document.getElementById('freeModeBtn'),
+            limitSelector: document.getElementById('limitSelector'),
+            dhikrSelector: document.getElementById('dhikrSelector'),
+            dhikrName: document.getElementById('dhikrName'),
+            progressLabel: document.getElementById('progressLabel'),
+            dialCenter: document.getElementById('dialCenter'),
+            dialRing: document.getElementById('dialRing'),
+            counter: document.getElementById('counter'),
+            progressText: document.getElementById('progressText'),
+            progressCircle: document.getElementById('progressCircle'),
+            resetBtn: document.getElementById('resetBtn'),
+            changeNameBtn: document.getElementById('changeNameBtn'),
+            themeGrid: document.getElementById('themeGrid'),
+            closeThemeBtn: document.getElementById('closeThemeBtn'),
+            salahList: document.getElementById('salahList'),
+            leaderboardList: document.getElementById('leaderboardList')
+        };
 
-        // ============================================
-        // PROGRESS RING SETUP
-        // ============================================
         const radius = 145;
         const circumference = 2 * Math.PI * radius;
-        progressCircle.style.strokeDasharray = circumference;
-        progressCircle.style.strokeDashoffset = circumference;
+        elements.progressCircle.style.strokeDasharray = circumference;
+        elements.progressCircle.style.strokeDashoffset = circumference;
 
-        // ============================================
-        // LOCALSTORAGE
-        // ============================================
         function getToday() {
             const now = new Date();
             return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
         }
 
         function loadData() {
-            const savedLang = localStorage.getItem('language');
-            const savedName = localStorage.getItem('userName');
-            const savedTheme = localStorage.getItem('theme');
-            const savedDate = localStorage.getItem('lastDate');
-            const savedMode = localStorage.getItem('mode');
+            currentLang = localStorage.getItem('language') || 'en';
+            userName = localStorage.getItem('userName') || '';
+            currentTheme = localStorage.getItem('theme') || 'green';
+            mode = localStorage.getItem('mode') || 'sunnah';
             const savedLimit = localStorage.getItem('limit');
-            const today = getToday();
+            limit = savedLimit === 'unlimited' ? 'unlimited' : parseInt(savedLimit || 100);
 
-            if (savedLang) currentLang = savedLang;
-            if (savedName) userName = savedName;
-            if (savedTheme) currentTheme = savedTheme;
-            if (savedMode) mode = savedMode;
-            if (savedLimit) limit = savedLimit === 'unlimited' ? 'unlimited' : parseInt(savedLimit);
+            const today = getToday();
+            const savedDate = localStorage.getItem('lastDate');
 
             if (savedDate !== today) {
                 localStorage.setItem('lastDate', today);
-                // FIX #2: Reset both step AND count for Sunnah mode
                 localStorage.setItem('sunnahStep', '0');
                 localStorage.setItem('sunnahCount', '0');
+                dhikrKeys.forEach(key => localStorage.removeItem(`count_${key}`));
+                salahKeys.forEach(key => localStorage.removeItem(`salah_${key}`));
                 sunnahStep = 0;
                 count = 0;
-                dhikrKeys.forEach(key => {
-                    localStorage.removeItem(`count_${key}`);
-                });
-                salahKeys.forEach(key => {
-                    localStorage.removeItem(`salah_${key}`);
-                });
             } else {
-                const savedSunnahStep = localStorage.getItem('sunnahStep');
-                const savedSunnahCount = localStorage.getItem('sunnahCount');
-                // FIX #2: Properly load saved values with defaults
-                sunnahStep = savedSunnahStep !== null ? parseInt(savedSunnahStep) : 0;
-                count = savedSunnahCount !== null ? parseInt(savedSunnahCount) : 0;
+                sunnahStep = parseInt(localStorage.getItem('sunnahStep') || 0);
+                count = parseInt(localStorage.getItem('sunnahCount') || 0);
             }
 
             document.documentElement.setAttribute('data-theme', currentTheme);
@@ -1021,7 +847,7 @@
         }
 
         function getCount(dhikr) {
-            return parseInt(localStorage.getItem(`count_${dhikr}`) || '0');
+            return parseInt(localStorage.getItem(`count_${dhikr}`) || 0);
         }
 
         function saveSalah(salah, checked) {
@@ -1036,61 +862,57 @@
             return localStorage.getItem(`salah_${salah}`) === 'true';
         }
 
-        // ============================================
-        // HAPTICS & SOUND
-        // ============================================
         function vibrate(duration) {
-            if (navigator.vibrate) {
-                navigator.vibrate(duration);
-            }
+            if (navigator.vibrate) navigator.vibrate(duration);
         }
 
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         
         function playTapSound() {
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-            osc.connect(gain);
-            gain.connect(audioContext.destination);
-            osc.frequency.value = 800;
-            osc.type = 'sine';
-            gain.gain.setValueAtTime(0.08, audioContext.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.06);
-            osc.start();
-            osc.stop(audioContext.currentTime + 0.06);
+            try {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.frequency.value = 800;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.08, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.06);
+                osc.start();
+                osc.stop(audioContext.currentTime + 0.06);
+            } catch (e) {}
         }
 
         function playCompleteSound() {
             vibrate([50, 30, 50, 30, 100]);
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-            osc.connect(gain);
-            gain.connect(audioContext.destination);
-            osc.frequency.value = 1000;
-            osc.type = 'sine';
-            gain.gain.setValueAtTime(0.12, audioContext.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.25);
-            osc.start();
-            osc.stop(audioContext.currentTime + 0.25);
+            try {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.frequency.value = 1000;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.12, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.25);
+                osc.start();
+                osc.stop(audioContext.currentTime + 0.25);
+            } catch (e) {}
         }
 
-        // ============================================
-        // UPDATE UI
-        // ============================================
         function updateLanguage() {
             const t = translations[currentLang];
             document.body.className = currentLang === 'ar' ? 'rtl' : '';
-            langToggle.textContent = currentLang === 'en' ? 'العربية' : 'English';
+            elements.langToggle.textContent = currentLang === 'en' ? 'العربية' : 'English';
             
             document.getElementById('modalTitle').textContent = t.enterName;
             document.getElementById('themeModalTitle').textContent = t.chooseTheme;
-            nameInput.placeholder = t.namePlaceholder;
-            saveNameBtn.textContent = t.save;
-            closeThemeBtn.textContent = t.done;
-            resetBtn.textContent = t.reset;
-            changeNameBtn.textContent = t.changeName;
-            sunnahModeBtn.textContent = t.sunnahMode;
-            freeModeBtn.textContent = t.freeMode;
+            elements.nameInput.placeholder = t.namePlaceholder;
+            elements.saveNameBtn.textContent = t.save;
+            elements.closeThemeBtn.textContent = t.done;
+            elements.resetBtn.textContent = t.reset;
+            elements.changeNameBtn.textContent = t.changeName;
+            elements.sunnahModeBtn.textContent = t.sunnahMode;
+            elements.freeModeBtn.textContent = t.freeMode;
             document.getElementById('salahTitle').textContent = t.salahTitle;
             document.getElementById('leaderboardTitle').textContent = t.leaderboardTitle;
             document.getElementById('resetTime').textContent = t.resetTime;
@@ -1105,47 +927,43 @@
 
         function updateGreeting() {
             const t = translations[currentLang];
-            const greeting = userName ? `${t.greeting}, ${userName}` : t.greeting;
-            userGreeting.textContent = greeting;
+            elements.userGreeting.textContent = userName ? `${t.greeting}, ${userName}` : t.greeting;
         }
 
         function updateDisplay() {
             const t = translations[currentLang];
             
             if (mode === 'sunnah') {
-                // FIX #2: Ensure step doesn't exceed bounds
-                if (sunnahStep >= sunnahSequence.length) {
-                    sunnahStep = sunnahSequence.length - 1;
-                }
+                if (sunnahStep >= sunnahSequence.length) sunnahStep = sunnahSequence.length - 1;
                 const seq = sunnahSequence[sunnahStep];
                 currentDhikr = seq.dhikr;
                 goal = seq.goal;
-                dhikrName.textContent = t.dhikr[currentDhikr];
-                progressLabel.textContent = `${sunnahStep + 1} / 3`;
-                progressLabel.style.display = 'block';
+                elements.dhikrName.textContent = t.dhikr[currentDhikr];
+                elements.progressLabel.textContent = `${sunnahStep + 1} / 3`;
+                elements.progressLabel.style.display = 'block';
             } else {
-                dhikrName.textContent = t.dhikr[currentDhikr];
-                progressLabel.style.display = 'none';
+                elements.dhikrName.textContent = t.dhikr[currentDhikr];
+                elements.progressLabel.style.display = 'none';
                 count = getCount(currentDhikr);
                 goal = limit === 'unlimited' ? 999999 : limit;
             }
             
-            counter.textContent = count;
+            elements.counter.textContent = count;
             
             if (limit === 'unlimited' && mode === 'free') {
-                progressText.textContent = `${count}`;
+                elements.progressText.textContent = `${count}`;
             } else {
-                progressText.textContent = count === 0 ? t.tapToBegin : `${count} / ${goal}`;
+                elements.progressText.textContent = count === 0 ? t.tapToBegin : `${count} / ${goal}`;
             }
             
             const percentage = limit === 'unlimited' ? 0 : Math.min(count / goal, 1);
             const offset = circumference - (percentage * circumference);
-            progressCircle.style.strokeDashoffset = offset;
+            elements.progressCircle.style.strokeDashoffset = offset;
         }
 
         function renderDhikrButtons() {
             const t = translations[currentLang];
-            dhikrSelector.innerHTML = '';
+            elements.dhikrSelector.innerHTML = '';
             
             dhikrKeys.forEach(key => {
                 const btn = document.createElement('button');
@@ -1160,13 +978,13 @@
                     renderLeaderboard();
                     vibrate(5);
                 };
-                dhikrSelector.appendChild(btn);
+                elements.dhikrSelector.appendChild(btn);
             });
         }
 
         function renderSalahList() {
             const t = translations[currentLang];
-            salahList.innerHTML = '';
+            elements.salahList.innerHTML = '';
             
             salahKeys.forEach(key => {
                 const item = document.createElement('div');
@@ -1186,20 +1004,19 @@
                     vibrate(10);
                 };
                 
-                salahList.appendChild(item);
+                elements.salahList.appendChild(item);
             });
         }
 
         function renderLeaderboard() {
             const t = translations[currentLang];
-            leaderboardList.innerHTML = '';
+            elements.leaderboardList.innerHTML = '';
             
-            // Calculate daily totals from localStorage
             let total = 0;
             const items = dhikrKeys.map(key => {
-                const count = getCount(key);
-                total += count;
-                return { key, count };
+                const cnt = getCount(key);
+                total += cnt;
+                return { key, count: cnt };
             }).sort((a, b) => b.count - a.count);
             
             items.forEach(({ key, count }) => {
@@ -1209,7 +1026,7 @@
                     <div class="dhikr-label">${t.dhikr[key]}</div>
                     <div class="dhikr-count">${count}</div>
                 `;
-                leaderboardList.appendChild(item);
+                elements.leaderboardList.appendChild(item);
             });
             
             const totalItem = document.createElement('div');
@@ -1221,7 +1038,7 @@
                 <div class="dhikr-label" style="font-weight: 700;">Total</div>
                 <div class="dhikr-count" style="font-size: 20px;">${total}</div>
             `;
-            leaderboardList.appendChild(totalItem);
+            elements.leaderboardList.appendChild(totalItem);
         }
 
         function renderThemeOptions() {
@@ -1234,7 +1051,7 @@
                 { id: 'charcoal', color: '#A0A8B8' }
             ];
             
-            themeGrid.innerHTML = '';
+            elements.themeGrid.innerHTML = '';
             
             themes.forEach(theme => {
                 const option = document.createElement('div');
@@ -1254,65 +1071,56 @@
                     vibrate(5);
                 };
                 
-                themeGrid.appendChild(option);
+                elements.themeGrid.appendChild(option);
             });
         }
 
-        // ============================================
-        // TAP HANDLER - FIX #1 & #2
-        // ============================================
-        dialCenter.addEventListener('pointerdown', (e) => {
+        // TAP HANDLER
+        elements.dialCenter.addEventListener('pointerdown', (e) => {
             e.preventDefault();
             e.stopPropagation();
             
             count++;
-            
-            counter.textContent = count;
-            counter.classList.add('pulse');
-            setTimeout(() => counter.classList.remove('pulse'), 200);
+            elements.counter.textContent = count;
+            elements.counter.classList.add('pulse');
+            setTimeout(() => elements.counter.classList.remove('pulse'), 200);
             
             const percentage = limit === 'unlimited' ? 0 : Math.min(count / goal, 1);
             const offset = circumference - (percentage * circumference);
-            progressCircle.style.strokeDashoffset = offset;
+            elements.progressCircle.style.strokeDashoffset = offset;
             
             const t = translations[currentLang];
             if (limit === 'unlimited' && mode === 'free') {
-                progressText.textContent = `${count}`;
+                elements.progressText.textContent = `${count}`;
             } else {
-                progressText.textContent = `${count} / ${goal}`;
+                elements.progressText.textContent = `${count} / ${goal}`;
             }
             
             vibrate(8);
             playTapSound();
             
-            // FIX #2: Proper sequence advancement logic
             if (count >= goal && limit !== 'unlimited') {
-                dialRing.classList.add('goal-complete-glow');
-                setTimeout(() => dialRing.classList.remove('goal-complete-glow'), 1000);
+                elements.dialRing.classList.add('goal-glow');
+                setTimeout(() => elements.dialRing.classList.remove('goal-glow'), 1000);
                 playCompleteSound();
                 
                 if (mode === 'sunnah') {
                     setTimeout(() => {
-                        if (sunnahStep < 2) { // Only advance if not at last step
-                            // FIX: Save the completed dhikr count to leaderboard storage
-                            const completedDhikr = sunnahSequence[sunnahStep].dhikr;
-                            const completedGoal = sunnahSequence[sunnahStep].goal;
-                            const currentCount = getCount(completedDhikr);
-                            localStorage.setItem(`count_${completedDhikr}`, (currentCount + completedGoal).toString());
-                            
+                        // Save completed dhikr to leaderboard
+                        const completedDhikr = sunnahSequence[sunnahStep].dhikr;
+                        const completedGoal = sunnahSequence[sunnahStep].goal;
+                        const currentLeaderboardCount = getCount(completedDhikr);
+                        localStorage.setItem(`count_${completedDhikr}`, (currentLeaderboardCount + completedGoal).toString());
+                        
+                        if (sunnahStep < 2) {
                             sunnahStep++;
-                            count = 0; // Reset count for next dhikr
+                            count = 0;
                             saveData();
                             updateDisplay();
-                            renderLeaderboard(); // Update leaderboard immediately
+                            renderLeaderboard();
                         } else {
-                            // FIX: Save the final dhikr count too
-                            const completedDhikr = sunnahSequence[sunnahStep].dhikr;
-                            const completedGoal = sunnahSequence[sunnahStep].goal;
-                            const currentCount = getCount(completedDhikr);
-                            localStorage.setItem(`count_${completedDhikr}`, (currentCount + completedGoal).toString());
-                            renderLeaderboard(); // Update leaderboard
-                            progressText.textContent = t.complete;
+                            renderLeaderboard();
+                            elements.progressText.textContent = t.complete;
                         }
                     }, 1000);
                 }
@@ -1322,40 +1130,35 @@
             saveData();
         });
 
-        // ============================================
         // MODE SWITCHING
-        // ============================================
-        sunnahModeBtn.addEventListener('click', () => {
+        elements.sunnahModeBtn.addEventListener('click', () => {
             mode = 'sunnah';
-            // FIX #2: Load saved progress properly
-            sunnahStep = parseInt(localStorage.getItem('sunnahStep') || '0');
-            count = parseInt(localStorage.getItem('sunnahCount') || '0');
-            sunnahModeBtn.classList.add('active');
-            freeModeBtn.classList.remove('active');
-            limitSelector.classList.add('hidden');
-            dhikrSelector.classList.add('hidden');
+            sunnahStep = parseInt(localStorage.getItem('sunnahStep') || 0);
+            count = parseInt(localStorage.getItem('sunnahCount') || 0);
+            elements.sunnahModeBtn.classList.add('active');
+            elements.freeModeBtn.classList.remove('active');
+            elements.limitSelector.classList.add('hidden');
+            elements.dhikrSelector.classList.add('hidden');
             updateDisplay();
             saveData();
             vibrate(5);
         });
 
-        freeModeBtn.addEventListener('click', () => {
+        elements.freeModeBtn.addEventListener('click', () => {
             mode = 'free';
             currentDhikr = 'subhanallah';
             count = getCount(currentDhikr);
-            freeModeBtn.classList.add('active');
-            sunnahModeBtn.classList.remove('active');
-            limitSelector.classList.remove('hidden');
-            dhikrSelector.classList.remove('hidden');
+            elements.freeModeBtn.classList.add('active');
+            elements.sunnahModeBtn.classList.remove('active');
+            elements.limitSelector.classList.remove('hidden');
+            elements.dhikrSelector.classList.remove('hidden');
             updateDisplay();
             renderDhikrButtons();
             saveData();
             vibrate(5);
         });
 
-        // ============================================
         // LIMIT SELECTOR
-        // ============================================
         document.querySelectorAll('.limit-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.limit-btn').forEach(b => b.classList.remove('active'));
@@ -1367,10 +1170,8 @@
             });
         });
 
-        // ============================================
         // CONTROLS
-        // ============================================
-        resetBtn.addEventListener('click', () => {
+        elements.resetBtn.addEventListener('click', () => {
             if (mode === 'sunnah') {
                 count = 0;
                 sunnahStep = 0;
@@ -1386,53 +1187,56 @@
             vibrate(20);
         });
 
-        changeNameBtn.addEventListener('click', () => {
-            nameModal.classList.add('visible');
-            nameInput.value = userName;
-            nameInput.focus();
+        elements.changeNameBtn.addEventListener('click', () => {
+            elements.nameModal.classList.add('visible');
+            elements.nameInput.value = userName;
+            elements.nameInput.focus();
         });
 
-        langToggle.addEventListener('click', () => {
+        elements.langToggle.addEventListener('click', () => {
             currentLang = currentLang === 'en' ? 'ar' : 'en';
             updateLanguage();
             saveData();
             vibrate(5);
         });
 
-        themeToggle.addEventListener('click', () => {
-            themeModal.classList.add('visible');
+        elements.themeToggle.addEventListener('click', () => {
+            elements.themeModal.classList.add('visible');
             renderThemeOptions();
         });
 
-        // ============================================
         // MODALS
-        // ============================================
-        saveNameBtn.addEventListener('click', () => {
-            userName = nameInput.value.trim();
+        elements.saveNameBtn.addEventListener('click', () => {
+            userName = elements.nameInput.value.trim();
             saveData();
             updateGreeting();
-            nameModal.classList.remove('visible');
+            elements.nameModal.classList.remove('visible');
             vibrate(10);
         });
 
-        nameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') saveNameBtn.click();
+        elements.nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') elements.saveNameBtn.click();
         });
 
-        closeThemeBtn.addEventListener('click', () => {
-            themeModal.classList.remove('visible');
+        elements.closeThemeBtn.addEventListener('click', () => {
+            elements.themeModal.classList.remove('visible');
         });
 
-        nameModal.addEventListener('click', (e) => {
-            if (e.target === nameModal) {
-                nameModal.classList.remove('visible');
-            }
+        elements.nameModal.addEventListener('click', (e) => {
+            if (e.target === elements.nameModal) elements.nameModal.classList.remove('visible');
         });
 
-        themeModal.addEventListener('click', (e) => {
-            if (e.target === themeModal) {
-                themeModal.classList.remove('visible');
-            }
+        elements.themeModal.addEventListener('click', (e) => {
+            if (e.target === elements.themeModal) elements.themeModal.classList.remove('visible');
         });
 
-        // ====================
+        // INIT
+        loadData();
+        updateLanguage();
+        
+        if (mode === 'free') {
+            elements.freeModeBtn.click();
+        }
+    </script>
+</body>
+</html>
