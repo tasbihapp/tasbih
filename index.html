@@ -658,10 +658,10 @@
 
     <div class="footer">
         <div class="footer-credit">Made by Zul</div>
-        <a href="mailto:tasbihmuslimapp@gmail.com" class="footer-email">tasbihmuslimapp@gmail.com</a>
+        <a href="/cdn-cgi/l/email-protection#03776270616a6b6e76706f6a6e62737343646e626a6f2d606c6e" class="footer-email"><span class="__cf_email__" data-cfemail="611500120308090c14120d080c00111121060c00080d4f020e0c">[email&#160;protected]</span></a>
     </div>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // Prevent double-tap zoom
         let lastTouchEnd = 0;
         document.addEventListener('touchend', (e) => {
@@ -766,6 +766,7 @@
         let goal = 33;
         let limit = 100;
         let sunnahStep = 0;
+        let isTransitioning = false; // FIX: Prevent taps during sunnah transitions
 
         const elements = {
             nameModal: document.getElementById('nameModal'),
@@ -1080,6 +1081,11 @@
             e.preventDefault();
             e.stopPropagation();
             
+            // FIX: Block taps during Sunnah mode transitions
+            if (isTransitioning) {
+                return;
+            }
+            
             count++;
             elements.counter.textContent = count;
             elements.counter.classList.add('pulse');
@@ -1105,6 +1111,9 @@
                 playCompleteSound();
                 
                 if (mode === 'sunnah') {
+                    // FIX: Lock during transition
+                    isTransitioning = true;
+                    
                     setTimeout(() => {
                         // Save completed dhikr to leaderboard
                         const completedDhikr = sunnahSequence[sunnahStep].dhikr;
@@ -1122,6 +1131,9 @@
                             renderLeaderboard();
                             elements.progressText.textContent = t.complete;
                         }
+                        
+                        // FIX: Unlock after transition complete
+                        isTransitioning = false;
                     }, 1000);
                 }
             }
@@ -1135,6 +1147,7 @@
             mode = 'sunnah';
             sunnahStep = parseInt(localStorage.getItem('sunnahStep') || 0);
             count = parseInt(localStorage.getItem('sunnahCount') || 0);
+            isTransitioning = false; // FIX: Unlock when switching modes
             elements.sunnahModeBtn.classList.add('active');
             elements.freeModeBtn.classList.remove('active');
             elements.limitSelector.classList.add('hidden');
@@ -1148,6 +1161,7 @@
             mode = 'free';
             currentDhikr = 'subhanallah';
             count = getCount(currentDhikr);
+            isTransitioning = false; // FIX: Unlock when switching modes
             elements.freeModeBtn.classList.add('active');
             elements.sunnahModeBtn.classList.remove('active');
             elements.limitSelector.classList.remove('hidden');
@@ -1172,6 +1186,7 @@
 
         // CONTROLS
         elements.resetBtn.addEventListener('click', () => {
+            isTransitioning = false; // FIX: Unlock when resetting
             if (mode === 'sunnah') {
                 count = 0;
                 sunnahStep = 0;
