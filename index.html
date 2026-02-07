@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- FIX #1: Prevent zoom on tap - added user-scalable=no and proper viewport settings -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Tasbih</title>
@@ -19,6 +20,9 @@
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            /* FIX #1: Prevent text selection and zoom */
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
         }
 
         /* ============================================
@@ -83,11 +87,13 @@
             background: var(--bg);
             color: var(--text-main);
             transition: background 0.3s ease, color 0.3s ease;
+            /* FIX #1: Prevent zoom on double tap */
+            touch-action: pan-y;
         }
 
         body {
             padding: 20px;
-            padding-bottom: 100px;
+            padding-bottom: 120px; /* Increased for email display */
         }
 
         body.rtl {
@@ -280,6 +286,7 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 24px;
+            /* FIX #1: Critical - prevent any zoom behavior */
             touch-action: manipulation;
             cursor: pointer;
         }
@@ -341,6 +348,7 @@
             box-shadow: 
                 0 8px 32px rgba(0, 0, 0, 0.4),
                 inset 0 2px 8px rgba(143, 240, 200, 0.05);
+            /* FIX #1: Critical - prevent zoom on this tap target */
             touch-action: manipulation;
             cursor: pointer;
         }
@@ -422,7 +430,7 @@
         }
 
         /* ============================================
-           ADDED: SALAH TRACKER
+           SALAH TRACKER
            ============================================ */
         .salah-section {
             background: var(--surface);
@@ -494,7 +502,7 @@
         }
 
         /* ============================================
-           ADDED: LEADERBOARD
+           LEADERBOARD
            ============================================ */
         .leaderboard-section {
             background: var(--surface);
@@ -656,28 +664,35 @@
         }
 
         /* ============================================
-           FOOTER
+           FOOTER - FIX #3: Added email display
            ============================================ */
         .footer {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            padding: 20px;
+            padding: 16px 20px;
             text-align: center;
             background: var(--bg);
             border-top: 1px solid var(--ring-base);
         }
 
-        .footer a {
+        .footer-credit {
             color: var(--text-muted);
-            text-decoration: none;
             font-size: 13px;
-            opacity: 0.7;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+
+        .footer-email {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 12px;
+            opacity: 0.9;
             transition: opacity 0.2s ease;
         }
 
-        .footer a:hover {
+        .footer-email:hover {
             opacity: 1;
         }
 
@@ -749,7 +764,7 @@
     <!-- Counter -->
     <div class="counter-container">
         <div class="dhikr-name" id="dhikrName">SubhanAllah</div>
-        <div class="progress-label" id="progressLabel">1 / 33</div>
+        <div class="progress-label" id="progressLabel">1 / 3</div>
         
         <div class="dial-container" id="dialContainer">
             <div class="dial-ring" id="dialRing"></div>
@@ -773,13 +788,13 @@
         <button class="control-btn" id="changeNameBtn">Name</button>
     </div>
 
-    <!-- ADDED: Salah Tracker -->
+    <!-- Salah Tracker -->
     <div class="salah-section">
         <div class="section-title" id="salahTitle">Today's Salah</div>
         <div class="salah-list" id="salahList"></div>
     </div>
 
-    <!-- ADDED: Leaderboard -->
+    <!-- Leaderboard -->
     <div class="leaderboard-section">
         <div class="leaderboard-header">
             <div class="section-title" id="leaderboardTitle">Today's Progress</div>
@@ -788,12 +803,23 @@
         <div class="leaderboard-list" id="leaderboardList"></div>
     </div>
 
-    <!-- Footer -->
+    <!-- FIX #3: Footer with visible email -->
     <div class="footer">
-        <a href="mailto:tasbihmuslimapp@gmail.com">Made by Zul</a>
+        <div class="footer-credit">Made by Zul</div>
+        <a href="mailto:tasbihmuslimapp@gmail.com" class="footer-email">tasbihmuslimapp@gmail.com</a>
     </div>
 
     <script>
+        // FIX #1: Prevent double-tap zoom globally
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, { passive: false });
+
         // ============================================
         // TRANSLATIONS
         // ============================================
@@ -811,7 +837,6 @@
                 complete: 'Complete!',
                 chooseTheme: 'Choose Theme',
                 done: 'Done',
-                // ADDED: Salah & Leaderboard translations
                 salahTitle: "Today's Salah",
                 leaderboardTitle: "Today's Progress",
                 resetTime: 'Resets at midnight',
@@ -821,7 +846,6 @@
                     allahuakbar: 'Allahu Akbar',
                     astaghfirullah: 'Astaghfirullah'
                 },
-                // ADDED: Salah names
                 salah: {
                     fajr: 'Fajr',
                     dhuhr: 'Dhuhr',
@@ -850,7 +874,6 @@
                 complete: 'مكتمل!',
                 chooseTheme: 'اختر السمة',
                 done: 'تم',
-                // ADDED: Salah & Leaderboard translations
                 salahTitle: 'صلاة اليوم',
                 leaderboardTitle: 'تقدم اليوم',
                 resetTime: 'يعاد ضبطه في منتصف الليل',
@@ -860,7 +883,6 @@
                     allahuakbar: 'الله أكبر',
                     astaghfirullah: 'أستغفر الله'
                 },
-                // ADDED: Salah names in Arabic
                 salah: {
                     fajr: 'الفجر',
                     dhuhr: 'الظهر',
@@ -887,10 +909,9 @@
             { dhikr: 'alhamdulillah', goal: 33 },
             { dhikr: 'allahuakbar', goal: 34 }
         ];
-        // ADDED: Salah keys
         const salahKeys = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
 
-        let mode = 'sunnah'; // 'sunnah' or 'free'
+        let mode = 'sunnah';
         let currentDhikr = 'subhanallah';
         let currentLang = 'en';
         let currentTheme = 'green';
@@ -926,7 +947,6 @@
         const changeNameBtn = document.getElementById('changeNameBtn');
         const themeGrid = document.getElementById('themeGrid');
         const closeThemeBtn = document.getElementById('closeThemeBtn');
-        // ADDED: Salah & Leaderboard elements
         const salahList = document.getElementById('salahList');
         const leaderboardList = document.getElementById('leaderboardList');
 
@@ -961,23 +981,25 @@
             if (savedMode) mode = savedMode;
             if (savedLimit) limit = savedLimit === 'unlimited' ? 'unlimited' : parseInt(savedLimit);
 
-            // MODIFIED: Check if date changed - reset daily data INCLUDING salah
             if (savedDate !== today) {
                 localStorage.setItem('lastDate', today);
-                localStorage.removeItem('sunnahStep');
-                localStorage.removeItem('sunnahCount');
+                // FIX #2: Reset both step AND count for Sunnah mode
+                localStorage.setItem('sunnahStep', '0');
+                localStorage.setItem('sunnahCount', '0');
+                sunnahStep = 0;
+                count = 0;
                 dhikrKeys.forEach(key => {
                     localStorage.removeItem(`count_${key}`);
                 });
-                // ADDED: Clear salah on date change
                 salahKeys.forEach(key => {
                     localStorage.removeItem(`salah_${key}`);
                 });
             } else {
                 const savedSunnahStep = localStorage.getItem('sunnahStep');
                 const savedSunnahCount = localStorage.getItem('sunnahCount');
-                if (savedSunnahStep !== null) sunnahStep = parseInt(savedSunnahStep);
-                if (savedSunnahCount !== null) count = parseInt(savedSunnahCount);
+                // FIX #2: Properly load saved values with defaults
+                sunnahStep = savedSunnahStep !== null ? parseInt(savedSunnahStep) : 0;
+                count = savedSunnahCount !== null ? parseInt(savedSunnahCount) : 0;
             }
 
             document.documentElement.setAttribute('data-theme', currentTheme);
@@ -1002,7 +1024,6 @@
             return parseInt(localStorage.getItem(`count_${dhikr}`) || '0');
         }
 
-        // ADDED: Salah localStorage functions
         function saveSalah(salah, checked) {
             if (checked) {
                 localStorage.setItem(`salah_${salah}`, 'true');
@@ -1070,7 +1091,6 @@
             changeNameBtn.textContent = t.changeName;
             sunnahModeBtn.textContent = t.sunnahMode;
             freeModeBtn.textContent = t.freeMode;
-            // ADDED: Update salah & leaderboard titles
             document.getElementById('salahTitle').textContent = t.salahTitle;
             document.getElementById('leaderboardTitle').textContent = t.leaderboardTitle;
             document.getElementById('resetTime').textContent = t.resetTime;
@@ -1079,7 +1099,6 @@
             updateDisplay();
             renderDhikrButtons();
             renderThemeOptions();
-            // ADDED: Render salah & leaderboard
             renderSalahList();
             renderLeaderboard();
         }
@@ -1094,6 +1113,10 @@
             const t = translations[currentLang];
             
             if (mode === 'sunnah') {
+                // FIX #2: Ensure step doesn't exceed bounds
+                if (sunnahStep >= sunnahSequence.length) {
+                    sunnahStep = sunnahSequence.length - 1;
+                }
                 const seq = sunnahSequence[sunnahStep];
                 currentDhikr = seq.dhikr;
                 goal = seq.goal;
@@ -1115,7 +1138,6 @@
                 progressText.textContent = count === 0 ? t.tapToBegin : `${count} / ${goal}`;
             }
             
-            // Update progress ring
             const percentage = limit === 'unlimited' ? 0 : Math.min(count / goal, 1);
             const offset = circumference - (percentage * circumference);
             progressCircle.style.strokeDashoffset = offset;
@@ -1135,7 +1157,6 @@
                     count = getCount(currentDhikr);
                     renderDhikrButtons();
                     updateDisplay();
-                    // ADDED: Update leaderboard when switching dhikr
                     renderLeaderboard();
                     vibrate(5);
                 };
@@ -1143,7 +1164,6 @@
             });
         }
 
-        // ADDED: Render Salah List
         function renderSalahList() {
             const t = translations[currentLang];
             salahList.innerHTML = '';
@@ -1170,7 +1190,6 @@
             });
         }
 
-        // ADDED: Render Leaderboard
         function renderLeaderboard() {
             const t = translations[currentLang];
             leaderboardList.innerHTML = '';
@@ -1192,7 +1211,6 @@
                 leaderboardList.appendChild(item);
             });
             
-            // Add total
             const totalItem = document.createElement('div');
             totalItem.className = 'leaderboard-item';
             totalItem.style.borderTop = '2px solid var(--ring-base)';
@@ -1240,19 +1258,18 @@
         }
 
         // ============================================
-        // TAP HANDLER - MOBILE OPTIMIZED
+        // TAP HANDLER - FIX #1 & #2
         // ============================================
         dialCenter.addEventListener('pointerdown', (e) => {
             e.preventDefault();
+            e.stopPropagation();
             
             count++;
             
-            // Update display
             counter.textContent = count;
             counter.classList.add('pulse');
             setTimeout(() => counter.classList.remove('pulse'), 200);
             
-            // Update progress
             const percentage = limit === 'unlimited' ? 0 : Math.min(count / goal, 1);
             const offset = circumference - (percentage * circumference);
             progressCircle.style.strokeDashoffset = offset;
@@ -1264,24 +1281,22 @@
                 progressText.textContent = `${count} / ${goal}`;
             }
             
-            // Haptic & sound
             vibrate(8);
             playTapSound();
             
-            // Check completion
+            // FIX #2: Proper sequence advancement logic
             if (count >= goal && limit !== 'unlimited') {
                 dialRing.classList.add('goal-complete-glow');
                 setTimeout(() => dialRing.classList.remove('goal-complete-glow'), 1000);
                 playCompleteSound();
                 
                 if (mode === 'sunnah') {
-                    // Auto-advance to next dhikr
                     setTimeout(() => {
-                        if (sunnahStep < 2) {
+                        if (sunnahStep < 2) { // Only advance if not at last step
                             sunnahStep++;
-                            count = 0;
-                            updateDisplay();
+                            count = 0; // Reset count for next dhikr
                             saveData();
+                            updateDisplay();
                         } else {
                             progressText.textContent = t.complete;
                         }
@@ -1289,7 +1304,6 @@
                 }
             }
             
-            // ADDED: Update leaderboard on each tap
             renderLeaderboard();
             saveData();
         });
@@ -1299,8 +1313,9 @@
         // ============================================
         sunnahModeBtn.addEventListener('click', () => {
             mode = 'sunnah';
-            count = parseInt(localStorage.getItem('sunnahCount') || '0');
+            // FIX #2: Load saved progress properly
             sunnahStep = parseInt(localStorage.getItem('sunnahStep') || '0');
+            count = parseInt(localStorage.getItem('sunnahCount') || '0');
             sunnahModeBtn.classList.add('active');
             freeModeBtn.classList.remove('active');
             limitSelector.classList.add('hidden');
@@ -1345,14 +1360,13 @@
             if (mode === 'sunnah') {
                 count = 0;
                 sunnahStep = 0;
-                localStorage.removeItem('sunnahStep');
-                localStorage.removeItem('sunnahCount');
+                localStorage.setItem('sunnahStep', '0');
+                localStorage.setItem('sunnahCount', '0');
             } else {
                 count = 0;
                 localStorage.setItem(`count_${currentDhikr}`, '0');
             }
             updateDisplay();
-            // ADDED: Update leaderboard after reset
             renderLeaderboard();
             saveData();
             vibrate(20);
