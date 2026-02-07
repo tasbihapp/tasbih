@@ -806,10 +806,10 @@
     <!-- FIX #3: Footer with visible email -->
     <div class="footer">
         <div class="footer-credit">Made by Zul</div>
-        <a href="mailto:tasbihmuslimapp@gmail.com" class="footer-email">tasbihmuslimapp@gmail.com</a>
+        <a href="/cdn-cgi/l/email-protection#691d081a0b0001041c1a050004081919290e04080005470a0604" class="footer-email"><span class="__cf_email__" data-cfemail="6b1f0a18090203061e180702060a1b1b2b0c060a020745080406">[email&#160;protected]</span></a>
     </div>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // FIX #1: Prevent double-tap zoom globally
         let lastTouchEnd = 0;
         document.addEventListener('touchend', (e) => {
@@ -1194,6 +1194,7 @@
             const t = translations[currentLang];
             leaderboardList.innerHTML = '';
             
+            // Calculate daily totals from localStorage
             let total = 0;
             const items = dhikrKeys.map(key => {
                 const count = getCount(key);
@@ -1293,11 +1294,24 @@
                 if (mode === 'sunnah') {
                     setTimeout(() => {
                         if (sunnahStep < 2) { // Only advance if not at last step
+                            // FIX: Save the completed dhikr count to leaderboard storage
+                            const completedDhikr = sunnahSequence[sunnahStep].dhikr;
+                            const completedGoal = sunnahSequence[sunnahStep].goal;
+                            const currentCount = getCount(completedDhikr);
+                            localStorage.setItem(`count_${completedDhikr}`, (currentCount + completedGoal).toString());
+                            
                             sunnahStep++;
                             count = 0; // Reset count for next dhikr
                             saveData();
                             updateDisplay();
+                            renderLeaderboard(); // Update leaderboard immediately
                         } else {
+                            // FIX: Save the final dhikr count too
+                            const completedDhikr = sunnahSequence[sunnahStep].dhikr;
+                            const completedGoal = sunnahSequence[sunnahStep].goal;
+                            const currentCount = getCount(completedDhikr);
+                            localStorage.setItem(`count_${completedDhikr}`, (currentCount + completedGoal).toString());
+                            renderLeaderboard(); // Update leaderboard
                             progressText.textContent = t.complete;
                         }
                     }, 1000);
@@ -1421,15 +1435,4 @@
             }
         });
 
-        // ============================================
-        // INIT
-        // ============================================
-        loadData();
-        updateLanguage();
-        
-        if (mode === 'free') {
-            freeModeBtn.click();
-        }
-    </script>
-</body>
-</html>
+        // ====================
